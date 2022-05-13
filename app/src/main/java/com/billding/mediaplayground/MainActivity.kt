@@ -1,16 +1,28 @@
 package com.billding.mediaplayground
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.TextView
+import android.view.View
 
+/**
+ * 主Activity
+ */
 class MainActivity : AppCompatActivity() {
+
+    private var mTextureButton: View? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        mTextureButton = findViewById(R.id.button_texture_activity)
+        bindTextureButtonFunction()
+    }
 
-        // Example of a call to a native method
-        findViewById<TextView>(R.id.sample_text).text = stringFromJNI()
+    private fun bindTextureButtonFunction() {
+        mTextureButton?.setOnClickListener {
+            val intent = Intent(this, TextureSurfaceActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     /**
