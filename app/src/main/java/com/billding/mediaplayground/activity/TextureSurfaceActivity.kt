@@ -1,4 +1,4 @@
-package com.billding.mediaplayground
+package com.billding.mediaplayground.activity
 
 import android.graphics.SurfaceTexture
 import android.os.Bundle
@@ -9,9 +9,10 @@ import android.view.TextureView
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import com.billding.mediaplayground.R
 
 /**
- * 承载了一个Surface的Activity
+ * 承载了SurfaceView和TextureView的Activity
  */
 class TextureSurfaceActivity : AppCompatActivity() {
     companion object {
