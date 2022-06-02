@@ -183,14 +183,65 @@ void BaseDecoder::DecodingLoop() {
 
 void BaseDecoder::UpdateTimeStamp() {
 
+    LOGCATD("BaseDecoder::UpdateTimeStamp");
+    std::unique_lock<std::mutex> lock(m_Mutex);
+    if (m_Frame->pkt_dts != AV_NOPTS_VALUE) {
+        m_CurTimeStamp = m_Frame->pkt_dts;
+    } else if (m_Frame->pts != AV_NOPTS_VALUE) {
+        m_CurTimeStamp = m_Frame->pts;
+    } else {
+        m_CurTimeStamp = 0;
+    }
+
+    m_CurTimeStamp = (int64_t)((m_CurTimeStamp * av_q2d(m_AVFormatContext->streams[m_StreamIndex]->time_base)) * 1000);
+    if (m_SeekPosition > 0 && m_SeekSuccess) {
+        m_StartTimeStamp = GetSysCurrentTime() - m_CurTimeStamp;
+        m_SeekPosition = 0;
+        m_SeekSuccess = false;
+    }
+
 }
 
 long BaseDecoder::AVSync() {
-    return 0;
+    LOGCATD("BaseDecoder::AVSync");
+    long curSysTime = GetSysCurrentTime();
+    long elapsedTime = curSysTime - m_CurTimeStamp;
+
+    long delay = 0;
+
+    if (m_CurTimeStamp > elapsedTime) {
+        auto sleepTime = static_cast<unsigned  int>(m_CurTimeStamp - elapsedTime);
+        sleepTime = sleepTime > DELAY_THRESHOLD ? DELAY_THRESHOLD : sleepTime;
+        av_usleep(sleepTime * 1000);
+    }
+
+    delay = elapsedTime - m_CurTimeStamp;
+
+    return delay;
 }
 
 int BaseDecoder::DecodeOnePacket() {
-    return 0;
+    LOGCATD("BaseDecoder::DecodeOnePacket");
+    // 需要seek
+    if (m_SeekPosition > 0) {
+        int64_t  seek_target = static_cast<int64_t>(m_SeekPosition * 1000000);
+        int64_t seek_min = INT64_MIN;
+        int64_t seek_max = INT64_MAX;
+
+        int seek_ret = avformat_seek_file(m_AVFormatContext, -1, seek_min, seek_target, seek_max, 0);
+        if (seek_ret < 0) {
+            m_SeekSuccess = false;
+            LOGCATD("BaseDecoder::DecodeOnePacket error");
+        } else {
+            if (m_StreamIndex != -1) {
+                avcodec_flush_buffers(m_AVCodecContext);
+            }
+            ClearCache();
+            m_SeekSuccess = true;
+            LOGCATD("BaseDecoder::DecodeOnePacket success");
+        }
+    }
+
 }
 
 void BaseDecoder::SeekToPosition(float position) {
