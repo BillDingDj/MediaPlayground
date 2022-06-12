@@ -3,3 +3,15 @@
 //
 
 #include "VideoDecoder.h"
+
+void VideoDecoder::OnDecoderReady() {
+
+}
+
+void VideoDecoder::OnDecoderDone() {
+
+}
+
+void VideoDecoder::OnFrameAvailable(AVFrame *frame) {
+
+}

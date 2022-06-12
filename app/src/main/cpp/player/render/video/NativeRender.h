@@ -19,7 +19,7 @@ public:
 
     virtual void Init(int videoWidth, int videoHeight, int *dstSize);
 
-    virtual void RenderVideoFrame(NativeImage *pImage);
+//    virtual void RenderVideoFrame(NativeImage *pImage);
 
     virtual void UnInit();
 

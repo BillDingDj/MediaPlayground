@@ -242,6 +242,7 @@ int BaseDecoder::DecodeOnePacket() {
         }
     }
 
+    return 0;
 }
 
 void BaseDecoder::SeekToPosition(float position) {

@@ -28,6 +28,8 @@ include_directories(
         ${CMAKE_SOURCE_DIR}/player/render/audio
         ${CMAKE_SOURCE_DIR}/player/render/video
 )
+link_directories(
+        ${jnilibs}/${ANDROID_ABI})
 
 file(GLOB src-files
         native-lib.cpp
